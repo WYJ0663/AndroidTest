@@ -174,7 +174,6 @@ public class CameraPreview extends SurfaceView implements
     }
 
 
-
     public void tack(Camera.PictureCallback callback) {
         mCamera.takePicture(null, null, callback);
     }
@@ -189,5 +188,46 @@ public class CameraPreview extends SurfaceView implements
         }
     }
 
+    //打开闪光灯
+    public boolean turnLight() {
+
+
+        if (mCamera == null) {
+            return false;
+        }
+        Camera.Parameters parameters = mCamera.getParameters();
+        if (parameters == null) {
+            return false;
+        }
+
+        List<String> flashModes = parameters.getSupportedFlashModes();
+        // Check if camera flash exists
+        if (flashModes == null) {
+            // Use the screen as a flashlight (next best thing)
+            return false;
+        }
+        String flashMode = parameters.getFlashMode();
+        if (!Camera.Parameters.FLASH_MODE_TORCH.equals(flashMode)) {
+            // Turn on the flash
+            if (flashModes.contains(Camera.Parameters.FLASH_MODE_TORCH)) {
+                parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+                mCamera.setParameters(parameters);
+                return true;
+            } else {
+
+            }
+        } else if (!Camera.Parameters.FLASH_MODE_OFF.equals(flashMode)) {
+            // Turn off the flash
+            if (flashModes.contains(Camera.Parameters.FLASH_MODE_OFF)) {
+                parameters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+                mCamera.setParameters(parameters);
+                return false;
+            } else {
+                Log.e(TAG, "FLASH_MODE_OFF not supported");
+            }
+        }
+        return false;
+
+    }
 
 }
