@@ -24,6 +24,7 @@ public class OCRCameraActivity extends Activity implements View.OnClickListener,
 
     private CameraPreview cameraPreview;
     private FrameLayout preview;
+    private Button flashButton;
     private Button captureButton;
     private Button clearButton;
     private ImageView preViewImage;
@@ -42,6 +43,7 @@ public class OCRCameraActivity extends Activity implements View.OnClickListener,
     }
 
     private void initUI(Context context) {
+        flashButton = (Button) findViewById(R.id.button_flash);
         captureButton = (Button) findViewById(R.id.button_capture);
         clearButton = (Button) findViewById(R.id.button_clear);
         infoView = (TextView) findViewById(R.id.info);
@@ -52,6 +54,7 @@ public class OCRCameraActivity extends Activity implements View.OnClickListener,
         FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
         preview.addView(cameraPreview);
 
+        flashButton.setOnClickListener(this);
         captureButton.setOnClickListener(this);
         clearButton.setOnClickListener(this);
 
@@ -67,9 +70,15 @@ public class OCRCameraActivity extends Activity implements View.OnClickListener,
             progressDialog.show();
             rect = focusBoxView.getBox();
             cameraPreview.tack(this);
-        }else if (clearButton == v){
+        } else if (clearButton == v) {
             preViewImage.setImageBitmap(null);
             infoView.setText("");
+        } else if (flashButton == v) {
+            if (cameraPreview.turnLight()) {
+                flashButton.setText("关闭灯光");
+            } else {
+                flashButton.setText("打开灯光");
+            }
         }
 
     }
@@ -88,7 +97,8 @@ public class OCRCameraActivity extends Activity implements View.OnClickListener,
             @Override
             public void run() {
                 Log.d(TAG, "begin>>>>>>>");
-                String text = Orc.ocr(bitmap);
+                Orc orc = new Orc();
+                String text = orc.ocr(bitmap, OCRCameraActivity.this);
                 Message msg = new Message();
                 msg.obj = text;
                 msg.what = 1;

@@ -1,5 +1,6 @@
 package com.ptwyj.orc;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -8,6 +9,7 @@ import android.util.Log;
 import com.googlecode.tesseract.android.TessBaseAPI;
 
 import java.io.IOException;
+
 /**
  * Created by WYJ on 2015-08-26.
  */
@@ -16,7 +18,7 @@ public class Orc {
     private static final String TAG = "Orc";
     private static final String TESSBASE_PATH = "/mnt/sdcard/tesseract/";
     private static final String DEFAULT_LANGUAGE = "eng";
-    private static final String EXPECTED_FILE = TESSBASE_PATH + "tessdata/" + DEFAULT_LANGUAGE + ".traineddata";
+    //  private static final String EXPECTED_FILE = tessbase_path + "tessdata/" + DEFAULT_LANGUAGE + ".traineddata";
 
 
     public static Bitmap getBitmap(String path) {
@@ -77,13 +79,16 @@ public class Orc {
     }
 
     // 识别
-    public static String ocr(Bitmap bitmap) {
+    public String ocr(Bitmap bitmap, Context context) {
+        TessDataManager.initTessTrainedData(context);
+        TessBaseAPI tessBaseAPI = new TessBaseAPI();
+        String path = TessDataManager.getTesseractFolder();
 
         Log.v(TAG, "Before baseApi");
 
         TessBaseAPI baseApi = new TessBaseAPI();
         baseApi.setDebug(true);
-        baseApi.init(TESSBASE_PATH, DEFAULT_LANGUAGE);
+        baseApi.init(path, DEFAULT_LANGUAGE);
         baseApi.setImage(bitmap);
         String recognizedText = baseApi.getUTF8Text();
         baseApi.end();
@@ -101,4 +106,6 @@ public class Orc {
 
         return "";
     }
+
+
 }
