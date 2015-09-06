@@ -6,6 +6,7 @@
       <module fileurl="file://$PROJECT_DIR$/AidlServer/AidlServer.iml" filepath="$PROJECT_DIR$/AidlServer/AidlServer.iml" />
       <module fileurl="file://$PROJECT_DIR$/AndroidTest.iml" filepath="$PROJECT_DIR$/AndroidTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/Camera/Camera.iml" filepath="$PROJECT_DIR$/Camera/Camera.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Download/Download.iml" filepath="$PROJECT_DIR$/Download/Download.iml" />
       <module fileurl="file://$PROJECT_DIR$/OCR/OCR.iml" filepath="$PROJECT_DIR$/OCR/OCR.iml" />
     </modules>
   </component>

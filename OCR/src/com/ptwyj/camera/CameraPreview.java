@@ -21,45 +21,61 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * A basic Camera preview class
+ * WYJ 2015-8-31
  */
 public class CameraPreview extends SurfaceView implements
         SurfaceHolder.Callback {
     private final static String TAG = "CameraPreview";
 
-    private SurfaceHolder mHolder;
-    private Camera mCamera;
-    private Camera.Parameters mParameters;
+    private SurfaceHolder surfaceHolder;
+    private Camera camera;
+    private Camera.Parameters cameraParameters;
 
-    public CameraPreview(Activity context) {
-        super(context);
+    public CameraPreview(Activity activity) {
+        super(activity);
 
-        mCamera = Camera.open(); // 打开摄像头
-        mHolder = getHolder();
-        getHolder().setKeepScreenOn(true);      // 屏幕常亮
-        mCamera.setDisplayOrientation(getPreviewDegree(context));
-        mHolder.addCallback(this);
+        init(activity);
+        initCamera(activity);
 
-        mCamera.startPreview(); // 开始预览
-        // deprecated setting, but required on Android versions prior to 3.0
-        mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+
+    }
+
+    private void init(Activity activity) {
+        surfaceHolder = getHolder();
+        surfaceHolder.setKeepScreenOn(true);      // 屏幕常亮
+
+        surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+    }
+
+
+    private void initCamera(Activity activity) {
+        camera = Camera.open(); // 打开摄像头\
+        camera.setDisplayOrientation(getPreviewDegree(activity));
+        surfaceHolder.addCallback(this);
+        cameraParameters = camera.getParameters(); // 获取各项参数
+        cameraParameters.setPictureFormat(PixelFormat.JPEG); // 设置图片格式
+        List<Camera.Size> list = cameraParameters.getSupportedPictureSizes();
+        int i = list.size() / 2;//取中间像素值
+        cameraParameters.setPictureSize(list.get(i).width, list.get(i).height); // 设置保存的图片尺寸
+        surfaceHolder.setFixedSize(list.get(i).width, list.get(i).height);
+        camera.setParameters(cameraParameters);
+        camera.startPreview(); // 开始预览
     }
 
     // 创建相机预览
     public void surfaceCreated(SurfaceHolder holder) {
         try {
-            mCamera.setPreviewDisplay(holder);
-            mCamera.startPreview();
+            camera.setPreviewDisplay(holder);
+            camera.startPreview();
         } catch (IOException e) {
-            Log.d(TAG, "Error setting camera preview: " + e.getMessage());
         }
     }
 
     // 销毁相机预览
     public void surfaceDestroyed(SurfaceHolder holder) {
-        if (mCamera != null) {
-            mCamera.release(); // 释放照相机
-            mCamera = null;
+        if (camera != null) {
+            camera.release(); // 释放照相机
+            camera = null;
         }
     }
 
@@ -67,7 +83,7 @@ public class CameraPreview extends SurfaceView implements
         //  If your preview can change or rotate,take care of those events here.
         // Make sure to stop the preview before resizing or reformatting it.
 
-        if (mHolder.getSurface() == null) {
+        if (surfaceHolder.getSurface() == null) {
             // 预览不存在
             return;
         }
@@ -75,22 +91,15 @@ public class CameraPreview extends SurfaceView implements
 
         // 停止相机预览
         try {
-            mCamera.stopPreview();
+            camera.stopPreview();
         } catch (Exception e) {
         }
 
-        mParameters = mCamera.getParameters(); // 获取各项参数
-        mParameters.setPictureFormat(PixelFormat.JPEG); // 设置图片格式
-        List<Camera.Size> list = mParameters.getSupportedPictureSizes();
-        int i = list.size() / 2;//取中间像素值
-        mParameters.setPictureSize(list.get(i).width, list.get(i).height); // 设置保存的图片尺寸
-        getHolder().setFixedSize(list.get(i).width, list.get(i).height);
-        mCamera.setParameters(mParameters);
 
         // 开始相机预览
         try {
-            mCamera.setPreviewDisplay(mHolder);
-            mCamera.startPreview();
+            camera.setPreviewDisplay(surfaceHolder);
+            camera.startPreview();
         } catch (Exception e) {
             Log.d(TAG, "Error starting camera preview: " + e.getMessage());
         }
@@ -140,7 +149,7 @@ public class CameraPreview extends SurfaceView implements
             FileOutputStream fos = new FileOutputStream(pictureFile);
             fos.write(data);
             fos.close();
-            mCamera.startPreview();
+            camera.startPreview();
         } catch (FileNotFoundException e) {
             Log.d(TAG, "File not found: " + e.getMessage());
         } catch (IOException e) {
@@ -148,16 +157,12 @@ public class CameraPreview extends SurfaceView implements
         }
     }
 
-
+    //保存忘记名
     private static File getOutputMediaFile() {
         // To be safe, you should check that the SDCard is mounted
         // using Environment.getExternalStorageState() before doing this.
 
         File mediaStorageDir = new File(Environment.getExternalStorageDirectory(), "/26WYJ/");
-        // This location works best if you want the created images to be shared
-        // between applications and persist after your app has been uninstalled.
-
-        // Create the storage directory if it does not exist
         if (!mediaStorageDir.exists()) {
             if (!mediaStorageDir.mkdirs()) {
                 Log.d("MyCameraApp", "failed to create directory");
@@ -174,8 +179,9 @@ public class CameraPreview extends SurfaceView implements
     }
 
 
+    //照相
     public void tack(Camera.PictureCallback callback) {
-        mCamera.takePicture(null, null, callback);
+        camera.takePicture(null, null, callback);
     }
 
     public Bitmap Bytes2Bimap(byte[] data, Rect rect) {
@@ -188,14 +194,13 @@ public class CameraPreview extends SurfaceView implements
         }
     }
 
-    //打开闪光灯
+    //打开关闭闪光灯
     public boolean turnLight() {
 
-
-        if (mCamera == null) {
+        if (camera == null) {
             return false;
         }
-        Camera.Parameters parameters = mCamera.getParameters();
+        Camera.Parameters parameters = camera.getParameters();
         if (parameters == null) {
             return false;
         }
@@ -211,7 +216,7 @@ public class CameraPreview extends SurfaceView implements
             // Turn on the flash
             if (flashModes.contains(Camera.Parameters.FLASH_MODE_TORCH)) {
                 parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
-                mCamera.setParameters(parameters);
+                camera.setParameters(parameters);
                 return true;
             } else {
 
@@ -220,14 +225,13 @@ public class CameraPreview extends SurfaceView implements
             // Turn off the flash
             if (flashModes.contains(Camera.Parameters.FLASH_MODE_OFF)) {
                 parameters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
-                mCamera.setParameters(parameters);
+                camera.setParameters(parameters);
                 return false;
             } else {
                 Log.e(TAG, "FLASH_MODE_OFF not supported");
             }
         }
         return false;
-
     }
 
 }
