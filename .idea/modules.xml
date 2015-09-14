@@ -10,6 +10,7 @@
       <module fileurl="file://$PROJECT_DIR$/IMSI/IMSI.iml" filepath="$PROJECT_DIR$/IMSI/IMSI.iml" />
       <module fileurl="file://$PROJECT_DIR$/OCR/OCR.iml" filepath="$PROJECT_DIR$/OCR/OCR.iml" />
       <module fileurl="file://$PROJECT_DIR$/Sign/Sign.iml" filepath="$PROJECT_DIR$/Sign/Sign.iml" />
+      <module fileurl="file://$PROJECT_DIR$/disKillableService/disKillableService.iml" filepath="$PROJECT_DIR$/disKillableService/disKillableService.iml" />
     </modules>
   </component>
 </project>
