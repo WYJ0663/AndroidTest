@@ -22,6 +22,9 @@ public class MyActivity extends Activity {
 
     }
 
+    String page_name = "com.tencent.tmgp.lyzh.shoumeng";
+    String mode = "mode";
+    String pay_mode = "pay_mode";
 
     public void onClick(View view) {
         switch (view.getId()) {
